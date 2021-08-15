@@ -20,3 +20,34 @@
 Желаем вам удачи в написании ETL! Вы обязательно справитесь 💪 
 
 **Решение задачи залейте в папку `postgres_to_es` вашего репозитория.**
+
+## Разворачивание проекта
+
+1.  С клонируйте проект
+
+        git clone https://github.com/KorsakovPV/ETL
+    
+    В корневой папке находим файл .env.sample. Это шаблон файла переменных окружения. По образу и подобию необходимо создать файл .env и заполнить его своими значениями.
+
+
+2. Запускаем процесс сборки и запуска контейнеров:
+
+        docker-compose up --build
+
+3. Накатываем миграции:
+
+        docker-compose exec admin_panel python manage.py migrate
+
+4. Создаем пользователя с правами администратора:
+
+        docker-compose exec admin_panel python manage.py createsuperuser
+
+5. Добавляем в базу тестовые случайно сгенерированные данные:
+
+        docker-compose exec admin_panel python manage.py generating_data
+
+6. Собираем статику:
+
+        docker-compose exec admin_panel python manage.py collectstatic
+
+При работе над проектом использован стек технологий: **[Django](https://www.djangoproject.com/)**, **[Python](https://www.python.org/)**, **[PostgreSQL](https://www.postgresql.org/)**, **[NGINX](https://nginx.org/)**, **[Docker](https://www.docker.com/)**, **[Docker-Compose](https://docs.docker.com/compose/)**, **[GitHub](https://github.com)**, код написан в IDE **[PyCharm](https://www.jetbrains.com/pycharm/)**, **[OS Linux Mint](https://linuxmint.com/)**
