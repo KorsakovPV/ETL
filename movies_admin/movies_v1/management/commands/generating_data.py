@@ -1,5 +1,6 @@
 import logging
 import random
+from tqdm import tqdm
 
 import pyprind
 from django.core.management.base import BaseCommand
@@ -56,9 +57,11 @@ class Command(BaseCommand):
             films = []
             genres = []
             persons = []
-            bar = pyprind.ProgBar(film_count, title=f'Generating FilmWork {type}.')
+            # bar = pyprind.ProgBar(film_count, title=f'Generating FilmWork {type}.')
+            pbar = tqdm(total=film_count)
             for _ in range(film_count):
-                bar.update()
+                # bar.update()
+                pbar.update(1)
                 film = FilmWorkFactory.build(type=type)
 
                 film_genres = {random.choice(self.all_genre) for _ in
