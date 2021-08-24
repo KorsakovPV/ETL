@@ -54,3 +54,5 @@ doc.html
 /static/
 /postgres_data/
 /movies_admin/config/static/
+
+*.log
