@@ -28,7 +28,14 @@ class FilmWorkType(models.TextChoices):
     TV_SHOW = 'tv_show', _('tv_show')
 
 
-class Person(TimeStampedModel):
+class IndexedStampedModel(models.Model):
+    indexed = models.BooleanField(_('elasticsearch in indexed'), default=False)
+
+    class Meta:
+        abstract = True
+
+
+class Person(TimeStampedModel, IndexedStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     full_name = models.TextField(_('Full name'))
     birth_date = models.DateField(_('Birth date'), null=True, default=None)
@@ -42,7 +49,7 @@ class Person(TimeStampedModel):
         return self.full_name
 
 
-class Genre(TimeStampedModel):
+class Genre(TimeStampedModel, IndexedStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.TextField(_('name'))
     description = models.TextField(_('Description'), blank=True)
@@ -56,7 +63,7 @@ class Genre(TimeStampedModel):
         return self.name
 
 
-class FilmWork(TimeStampedModel):
+class FilmWork(TimeStampedModel, IndexedStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'), blank=True)
@@ -78,7 +85,7 @@ class FilmWork(TimeStampedModel):
         return self.title
 
 
-class FilmWorkPerson(TimeStampedModel):
+class FilmWorkPerson(TimeStampedModel, IndexedStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     film_work = models.ForeignKey(FilmWork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -91,7 +98,7 @@ class FilmWorkPerson(TimeStampedModel):
         unique_together = ('film_work', 'person', 'role')
 
 
-class FilmWorkGenre(TimeStampedModel):
+class FilmWorkGenre(TimeStampedModel, IndexedStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     film_work = models.ForeignKey(FilmWork, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
