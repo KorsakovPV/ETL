@@ -13,7 +13,7 @@ class PostgreSettings(BaseSettings):
     port: str = Field(..., env='POSTGRES_PORT')
 
     class Config:
-        env_file: str = '.env'
+        env_file: str = '../.env'
 
 
 class AbstractExtractor:
@@ -21,6 +21,7 @@ class AbstractExtractor:
 
     @abstractmethod
     def get_data(self):
+        pass
         """
         Возвращает массив не индексированных объектов
         :return:
@@ -28,6 +29,7 @@ class AbstractExtractor:
 
     @abstractmethod
     def set_index(self):
+        pass
         """
         Выставляет загруженным объектам признак индексации
         :return:
@@ -39,6 +41,7 @@ class AbstractTransformer:
 
     @abstractmethod
     def transform(self, row):
+        pass
         """
         Преобразование строки в формат для загрузки
         :param row: объект для преобразования
@@ -51,6 +54,7 @@ class AbstractLoader:
 
     @abstractmethod
     def load(self, data):
+        pass
         """
         Реализация этапа загрзки данных
         :param data: массив данных для загрузки

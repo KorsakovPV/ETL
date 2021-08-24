@@ -10,7 +10,9 @@ from transformer import Transformer
 
 from models import AbstractExtractor, AbstractLoader, AbstractTransformer, PostgreSettings
 
+logging.basicConfig(filename="sample1.log", level=logging.INFO)
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def coroutine(func):
@@ -44,6 +46,8 @@ def extract(target, extractor: AbstractExtractor):
 
         target.send(data)
         extractor.set_index()
+        logging.info(f'Extract! {len(data)}')
+
 
 
 @coroutine
@@ -68,14 +72,14 @@ def load(loader: AbstractLoader):
 
         loader.load(data)
 
-        logging.info('Loaded!')
+        logging.info(f'Loaded! {len(data)}')
 
 
 if __name__ == '__main__':
 
     with psycopg2.connect(**PostgreSettings().dict()) as pg_conn:
         # этап загрузки в es
-        loader = load(ESLoader(os.getenv('ES_HOST')))
+        loader = load(ESLoader(os.getenv('ES_HOST','http://localhost:9200/')))
 
         # этап подготовки данных
         transformer = transform(loader, Transformer())

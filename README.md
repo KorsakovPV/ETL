@@ -32,21 +32,25 @@
 
 2. Запускаем процесс сборки и запуска контейнеров:
 
-        docker-compose up --build
+        docker-compose up -d --build
 
-3. Накатываем миграции:
+3. создаем базу 
+
+        docker-compose exec db psql -U postgres -c 'CREATE DATABASE movies3;'
+
+5. Накатываем миграции:
 
         docker-compose exec admin_panel python manage.py migrate
 
-4. Создаем пользователя с правами администратора:
+6. Создаем пользователя с правами администратора:
 
         docker-compose exec admin_panel python manage.py createsuperuser
 
-5. Добавляем в базу тестовые случайно сгенерированные данные:
+7. Добавляем в базу тестовые случайно сгенерированные данные:
 
         docker-compose exec admin_panel python manage.py generating_data
 
-6. Собираем статику:
+8. Собираем статику:
 
         docker-compose exec admin_panel python manage.py collectstatic
 
