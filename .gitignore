@@ -56,3 +56,4 @@ doc.html
 /movies_admin/config/static/
 
 *.log
+/postgres_to_es/data_file.json
