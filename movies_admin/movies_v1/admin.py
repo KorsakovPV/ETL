@@ -39,7 +39,7 @@ class FilmWorkAdmin(admin.ModelAdmin):
         'creation_date',
         'rating',
         'certificate',
-        'file_path'
+        'file_path',
     )
     inlines = (PersonInLineAdmin, GenreInLineAdmin)
     search_fields = ('title', 'description', 'type', 'genres')
