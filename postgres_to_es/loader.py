@@ -1,19 +1,23 @@
+import json
 import logging
 from typing import List
-import requests
-import json
 from urllib.parse import urljoin
+
+import requests
+
 from models import AbstractLoader
 
+logging.basicConfig(filename="etl.log", level=logging.INFO)
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class ESLoader(AbstractLoader):
     def __init__(self, url: str):
         self.url = url
 
-    def load(self, data):
-        self.load_to_es(data, 'movies')
+    def load(self, data, table):
+        self.load_to_es(data, table)
 
     def _get_es_bulk_query(self, rows: List[dict], index_name: str) -> List[str]:
         """
@@ -22,7 +26,7 @@ class ESLoader(AbstractLoader):
         prepared_query = []
         for row in rows:
             prepared_query.extend([
-                json.dumps({'index': {'_index': index_name, '_id': row['id']}}),
+                json.dumps({'index': {'_index': index_name, '_id': row.get('id')}}),
                 json.dumps(row)
             ])
         return prepared_query
@@ -41,7 +45,7 @@ class ESLoader(AbstractLoader):
         )
 
         json_response = json.loads(response.content.decode())
-        for item in json_response['items']:
-            error_message = item['index'].get('error')
+        for item in json_response.get('items'):
+            error_message = item.get('index').get('error')
             if error_message:
                 logger.error(error_message)
