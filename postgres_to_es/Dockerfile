@@ -4,8 +4,8 @@ RUN mkdir /etl
 WORKDIR /etl
 
 # set environment variables
-#ENV PYTHONDONTWRITEBYTECODE 1
-#ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 and curl
 RUN apk update \
@@ -17,4 +17,4 @@ RUN pip install --upgrade pip
 COPY requirements.txt /etl/
 RUN pip install -r requirements.txt
 
-COPY wait_to_start.sh /etl/
+CMD python -u etl.py
