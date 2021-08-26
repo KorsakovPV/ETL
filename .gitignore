@@ -57,3 +57,4 @@ doc.html
 
 *.log
 /postgres_to_es/data_file.json
+/requirements.txt
