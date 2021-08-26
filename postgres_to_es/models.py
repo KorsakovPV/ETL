@@ -1,6 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from pydantic import BaseSettings, Field
-
+import abc
+import json
+import logging
+from json import JSONDecodeError
+from typing import Optional, Any
 
 class PostgreSettings(BaseSettings):
     """
@@ -60,3 +64,14 @@ class AbstractLoader:
         :param data: массив данных для загрузки
         :return:
         """
+
+class BaseStorage:
+    @abc.abstractmethod
+    def save_state(self, state: dict) -> None:
+        """Сохранить состояние в постоянное хранилище"""
+        pass
+
+    @abc.abstractmethod
+    def retrieve_state(self) -> dict:
+        """Загрузить состояние локально из постоянного хранилища"""
+        pass
