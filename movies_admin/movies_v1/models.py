@@ -28,14 +28,7 @@ class FilmWorkType(models.TextChoices):
     TV_SHOW = 'tv_show', _('tv_show')
 
 
-class IndexedStampedModel(models.Model):
-    indexed = models.BooleanField(_('elasticsearch in indexed'), default=False)
-
-    class Meta:
-        abstract = True
-
-
-class Person(TimeStampedModel, IndexedStampedModel):
+class Person(TimeStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     full_name = models.TextField(_('Full name'))
     birth_date = models.DateField(_('Birth date'), null=True, default=None)
@@ -49,7 +42,7 @@ class Person(TimeStampedModel, IndexedStampedModel):
         return self.full_name
 
 
-class Genre(TimeStampedModel, IndexedStampedModel):
+class Genre(TimeStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.TextField(_('name'))
     description = models.TextField(_('Description'), blank=True)
@@ -63,7 +56,7 @@ class Genre(TimeStampedModel, IndexedStampedModel):
         return self.name
 
 
-class FilmWork(TimeStampedModel, IndexedStampedModel):
+class FilmWork(TimeStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(_('Title'), max_length=255)
     description = models.TextField(_('Description'), blank=True)
@@ -85,7 +78,7 @@ class FilmWork(TimeStampedModel, IndexedStampedModel):
         return self.title
 
 
-class FilmWorkPerson(TimeStampedModel, IndexedStampedModel):
+class FilmWorkPerson(TimeStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     film_work = models.ForeignKey(FilmWork, on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -98,7 +91,7 @@ class FilmWorkPerson(TimeStampedModel, IndexedStampedModel):
         unique_together = ('film_work', 'person', 'role')
 
 
-class FilmWorkGenre(TimeStampedModel, IndexedStampedModel):
+class FilmWorkGenre(TimeStampedModel):
     id = models.UUIDField('id', primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     film_work = models.ForeignKey(FilmWork, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
