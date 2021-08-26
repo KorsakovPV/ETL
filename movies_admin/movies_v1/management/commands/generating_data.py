@@ -1,9 +1,8 @@
 import logging
 import random
-from tqdm import tqdm
 
-import pyprind
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from movies_v1.factories.film_work import FilmWorkFactory
 from movies_v1.factories.genre import GenreFactory, FilmWorkGenreFactory
@@ -15,16 +14,16 @@ from movies_v1.models import User, Genre, FilmWork, Person, FilmWorkGenre, FilmW
 class Command(BaseCommand):
     help = 'Generating data.'
 
-    USER = 10
-    GENRE = 100
-    PERSON = 1000
-    FILMWORK_FILM = 101
-    FILMWORK_SERIES = 202
-    FILMWORK_MIN_GENRE = 0
+    USER = 10  # 100
+    GENRE = 1000  # 10000
+    PERSON = 10000  # 100000
+    FILMWORK_FILM = 100000  # 1000000
+    FILMWORK_SERIES = 20000  # 200000
+    FILMWORK_MIN_GENRE = 1
     FILMWORK_MAX_GENRE = 5
-    FILMWORK_MIN_PERSONS = 0
+    FILMWORK_MIN_PERSONS = 1
     FILMWORK_MAX_PERSONS = 5
-    FILMWORK_GENRES_PERSONS = 72000
+    FILMWORK_GENRES_PERSONS = 720000  # 7200000
     PADGE = 10000
 
     def handle(self, *args, **options):
@@ -57,10 +56,8 @@ class Command(BaseCommand):
             films = []
             genres = []
             persons = []
-            # bar = pyprind.ProgBar(film_count, title=f'Generating FilmWork {type}.')
             pbar = tqdm(total=film_count)
             for _ in range(film_count):
-                # bar.update()
                 pbar.update(1)
                 film = FilmWorkFactory.build(type=type)
 
