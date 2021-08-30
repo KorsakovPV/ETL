@@ -24,7 +24,7 @@ class Command(BaseCommand):
     FILMWORK_MIN_PERSONS = 1
     FILMWORK_MAX_PERSONS = 5
     FILMWORK_GENRES_PERSONS = 720000  # 7200000
-    PADGE = 10000
+    PADGE = 20000
 
     def handle(self, *args, **options):
         """

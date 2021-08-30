@@ -5,11 +5,13 @@ from urllib.parse import urljoin
 
 import requests
 
-from models import AbstractLoader
+from models import AbstractLoader, logger
 
-logging.basicConfig(filename="etl.log", level=logging.INFO)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+
+# logging.basicConfig(filename="etl.log", level=logging.INFO)
+# logger = logging.getLogger()
+# logger.setLevel(logging.INFO)
+# from postgres_to_es.etl import logger
 
 
 class ESLoader(AbstractLoader):
@@ -46,6 +48,6 @@ class ESLoader(AbstractLoader):
 
         json_response = json.loads(response.content.decode())
         for item in json_response.get('items'):
-            error_message = item.get('index').get('error')
+            error_message = item.get('error')
             if error_message:
                 logger.error(error_message)

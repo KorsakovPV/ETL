@@ -12,12 +12,11 @@ from elasticsearch import Elasticsearch
 
 from extractor import PostgresExtractor
 from loader import ESLoader
-from models import AbstractExtractor, AbstractLoader, AbstractTransformer, PostgreSettings, BaseStorage
+from models import AbstractExtractor, AbstractLoader, AbstractTransformer, PostgreSettings, BaseStorage, logger, \
+    FILE_NAME
 from transformer import Transformer
 
-logging.basicConfig(filename="etl.log", level=logging.INFO)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+
 
 
 def coroutine(func):
@@ -34,16 +33,18 @@ def coroutine(func):
 def etl(target):
     logger.info('etl.py. Started.')
     while True:
-        pointer_begin_date = datetime.datetime.strptime(s.get_state('pointer_begin_date'), '%Y-%m-%d %H:%M:%S')
+        pointer_begin_date = datetime.datetime.strptime(state.get_state('pointer_begin_date'), '%Y-%m-%d %H:%M:%S')
         pointer_end_date = pointer_begin_date + datetime.timedelta(days=1)
 
         while datetime.datetime.now() < pointer_end_date:
+            logger.info(f'etl.py. pointer_end_date > now() pointer_end_date={pointer_end_date}, now()={datetime.datetime.now()}. Wait one hours.')
             sleep(3600)
 
+        target.send(['film_work', 'title', pointer_begin_date, pointer_end_date])
         target.send(['person', 'full_name', pointer_begin_date, pointer_end_date])
         target.send(['genre', 'name', pointer_begin_date, pointer_end_date])
-        target.send(['film_work', 'title', pointer_begin_date, pointer_end_date])
-        s.set_state('pointer_begin_date', str(pointer_end_date))
+
+        state.set_state('pointer_begin_date', str(pointer_end_date))
         sleep(0.1)
 
 
@@ -54,19 +55,14 @@ def extract(target, extractor: AbstractExtractor):
     while key := (yield):
 
         table, column, pointer_begin_date, pointer_end_date = key
-        data = extractor.get_data(
+        extractor.get_data(
+            target=target,
             table=table,
             column=column,
             pointer_begin_date=pointer_begin_date,
             pointer_end_date=pointer_end_date
         )
-        data_count = len(data)
-        if data_count == 0:
-            continue
 
-        target.send([data, table, column])
-        logger.info(
-            f'etl.py. Extract {table}. pointer_begin_date={pointer_begin_date}, pointer_end_date={pointer_end_date}. {len(data)} items.')
 
 
 @coroutine
@@ -92,9 +88,9 @@ def load(loader: AbstractLoader):
         if len(transformed) == 0:
             continue
 
+        logger.info(f'etl.py. Loaded start {table}. {len(transformed)} items.')
         loader.load(transformed, table)
-
-        logger.info(f'etl.py. Loaded {table}. {len(transformed)} items.')
+        logger.info(f'etl.py. Loaded stop {table}. {len(transformed)} items.')
 
 
 class JsonFileStorage(BaseStorage):
@@ -151,29 +147,31 @@ class State:
         return self.state.get(key)
 
 
-def connect__to_database():
+def connect_to_database():
     conn = None
     try:
         conn = psycopg2.connect(**PostgreSettings().dict())
         return conn
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        logger.info(f'etl.py. Connect to database ERROR. {error}')
     return False
 
 
 if __name__ == '__main__':
 
-    j = JsonFileStorage("data_file.json")
-    s = State(j)
-    begin_date = s.get_state('pointer_begin_date') or datetime.datetime(year=1940, month=1, day=1)
-    s.set_state('pointer_begin_date', str(begin_date))
+    json_file_storage = JsonFileStorage(FILE_NAME)
+    state = State(json_file_storage)
+    begin_date = state.get_state('pointer_begin_date') or datetime.datetime(year=2000, month=1, day=1)
+    state.set_state('pointer_begin_date', str(begin_date))
 
-    while not connect__to_database():
+    while not connect_to_database():
+        logger.info(f'etl.py. Wait connect to database Postgres. 10 sec.')
         sleep(10)
 
     es = Elasticsearch([os.getenv('ES_HOST', 'http://localhost:9200/')])
 
     while not es.ping():
+        logger.info(f'etl.py. Wait connect to database Elasticsearch. 10 sec.')
         sleep(10)
 
     with psycopg2.connect(**PostgreSettings().dict()) as pg_conn:

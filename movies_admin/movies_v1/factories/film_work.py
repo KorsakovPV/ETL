@@ -16,8 +16,8 @@ class FilmWorkFactory(DjangoModelFactory):
     mpaa_rating = fuzzy.FuzzyChoice(MPAARatingType)
     rating = fuzzy.FuzzyDecimal(0, 9.9)
     type = fuzzy.FuzzyChoice(FilmWorkType)
-    created = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(1940, 1, 1, tzinfo=UTC))
-    modified = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(1940, 1, 1, tzinfo=UTC))
+    created = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2020, 1, 1, tzinfo=UTC))
+    modified = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2020, 1, 1, tzinfo=UTC))
 
     class Meta:
         model = FilmWork

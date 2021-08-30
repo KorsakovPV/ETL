@@ -17,7 +17,7 @@ class PostgresExtractor(AbstractExtractor):
         self.conn = pg_conn
         self.cursor = pg_conn.cursor(cursor_factory=RealDictCursor)
 
-    def get_data(self, table, column, pointer_begin_date, pointer_end_date):
+    def get_data(self, target, table, column, pointer_begin_date, pointer_end_date):
         """
         Получает не проиндексированные фильмы
         :return: результат выборки
@@ -31,6 +31,12 @@ class PostgresExtractor(AbstractExtractor):
         """
 
         self.cursor.execute(sql)
-        self.data = self.cursor.fetchall()
-
-        return self.data
+        while True:
+            rows = self.cursor.fetchmany(50)
+            if not rows:
+                break
+            logger.info(
+                f'extractor.py. Extract start {table}. pointer_begin_date={pointer_begin_date}, pointer_end_date={pointer_end_date}. {len(rows)} items.')
+            target.send([rows, table, column])
+            logger.info(
+                f'extractor.py. Extract stop {table}. pointer_begin_date={pointer_begin_date}, pointer_end_date={pointer_end_date}. {len(rows)} items.')

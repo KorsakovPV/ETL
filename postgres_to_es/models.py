@@ -6,6 +6,11 @@ import logging
 from json import JSONDecodeError
 from typing import Optional, Any
 
+logging.basicConfig(filename="etl.log", level=logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+FILE_NAME = 'data_file.json'
+
 class PostgreSettings(BaseSettings):
     """
     Настройки подключения к базе данных

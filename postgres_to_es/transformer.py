@@ -12,5 +12,5 @@ class Transformer(AbstractTransformer):
 
         return {
                 'id': row.get('id'),
-                f'{column}': row.get(column)
+                column: row.get(column)
             }
