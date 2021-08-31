@@ -17,8 +17,6 @@ from models import AbstractExtractor, AbstractLoader, AbstractTransformer, Postg
 from transformer import Transformer
 
 
-
-
 def coroutine(func):
     @wraps(func)
     def inner(*args, **kwargs):
@@ -31,13 +29,19 @@ def coroutine(func):
 
 @backoff.on_exception(backoff.expo, BaseException)
 def etl(target):
+    json_file_storage = JsonFileStorage(FILE_NAME)
+    state = State(json_file_storage)
+    begin_date = state.get_state('pointer_begin_date') or datetime.datetime(year=2000, month=1, day=1)
+    state.set_state('pointer_begin_date', str(begin_date))
+
     logger.info('etl.py. Started.')
     while True:
         pointer_begin_date = datetime.datetime.strptime(state.get_state('pointer_begin_date'), '%Y-%m-%d %H:%M:%S')
         pointer_end_date = pointer_begin_date + datetime.timedelta(days=1)
 
         while datetime.datetime.now() < pointer_end_date:
-            logger.info(f'etl.py. pointer_end_date > now() pointer_end_date={pointer_end_date}, now()={datetime.datetime.now()}. Wait one hours.')
+            logger.info(
+                f'etl.py. pointer_end_date > now() pointer_end_date={pointer_end_date}, now()={datetime.datetime.now()}. Wait one hours.')
             sleep(3600)
 
         target.send(['film_work', 'title', pointer_begin_date, pointer_end_date])
@@ -53,7 +57,6 @@ def etl(target):
 def extract(target, extractor: AbstractExtractor):
     """ Получение неиндексированных данных """
     while key := (yield):
-
         table, column, pointer_begin_date, pointer_end_date = key
         extractor.get_data(
             target=target,
@@ -62,7 +65,6 @@ def extract(target, extractor: AbstractExtractor):
             pointer_begin_date=pointer_begin_date,
             pointer_end_date=pointer_end_date
         )
-
 
 
 @coroutine
@@ -158,11 +160,6 @@ def connect_to_database():
 
 
 if __name__ == '__main__':
-
-    json_file_storage = JsonFileStorage(FILE_NAME)
-    state = State(json_file_storage)
-    begin_date = state.get_state('pointer_begin_date') or datetime.datetime(year=2000, month=1, day=1)
-    state.set_state('pointer_begin_date', str(begin_date))
 
     while not connect_to_database():
         logger.info(f'etl.py. Wait connect to database Postgres. 10 sec.')

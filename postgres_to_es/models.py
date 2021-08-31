@@ -1,15 +1,14 @@
-from abc import ABCMeta, abstractmethod
-from pydantic import BaseSettings, Field
 import abc
-import json
 import logging
-from json import JSONDecodeError
-from typing import Optional, Any
+from abc import ABCMeta, abstractmethod
+
+from pydantic import BaseSettings, Field
 
 logging.basicConfig(filename="etl.log", level=logging.INFO)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 FILE_NAME = 'data_file.json'
+PADGE = 50
 
 class PostgreSettings(BaseSettings):
     """

@@ -8,9 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 and curl
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev \
-    && apk --no-cache add curl
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 
 # install python dependencies
 RUN pip install --upgrade pip

@@ -3,7 +3,7 @@ import logging
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import RealDictCursor
 
-from models import AbstractExtractor
+from models import AbstractExtractor, PADGE
 
 logging.basicConfig(filename="etl.log", level=logging.INFO)
 logger = logging.getLogger()
@@ -32,7 +32,7 @@ class PostgresExtractor(AbstractExtractor):
 
         self.cursor.execute(sql)
         while True:
-            rows = self.cursor.fetchmany(50)
+            rows = self.cursor.fetchmany(PADGE)
             if not rows:
                 break
             logger.info(

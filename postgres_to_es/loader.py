@@ -1,17 +1,10 @@
 import json
-import logging
 from typing import List
 from urllib.parse import urljoin
 
 import requests
 
 from models import AbstractLoader, logger
-
-
-# logging.basicConfig(filename="etl.log", level=logging.INFO)
-# logger = logging.getLogger()
-# logger.setLevel(logging.INFO)
-# from postgres_to_es.etl import logger
 
 
 class ESLoader(AbstractLoader):
@@ -48,6 +41,5 @@ class ESLoader(AbstractLoader):
 
         json_response = json.loads(response.content.decode())
         for item in json_response.get('items'):
-            error_message = item.get('error')
-            if error_message:
+            if error_message := item.get('error'):
                 logger.error(error_message)
